@@ -13,25 +13,30 @@ const token = '510500699:AAEAf_fGn0u9mAocdMeSUP5YQLb1fatnz4U' // process.env.BOT
 
 const bot = new Telegraf(token)
 
-bot.command('/oldschool', (ctx) => ctx.reply('Hello'))
-bot.command('/modern', ({ reply }) => reply('Yo'))
-bot.command('/hipster', reply('λ'))
 
-bot.command('/queasco', (ctx) => {
-    const chatId = "-267784992"
-    ctx.telegram.sendAudio(chatId, 'http://st09.ioo.cat/queascoche.mp3')
-}) 
+function displayAudioQueAsco(ctx) {
+    
+}
 
-bot.command('/dinar', (ctx) => {
-    const chatId = "-267784992" 
-    ctx.telegram.sendPhoto(chatId, 'http://st09.ioo.cat/dinar.jpg')
-})
 
-bot.command('/dinar', (ctx) => ctx.replyWithPhoto({ source: fs.createReadStream('/home/nvm/apps/parcerisbot/dinar.jpg') }))
 
-bot.command('/bitcoin', (ctx) => {
-   displayBitcoinPrice(ctx)
-})
+
+function displayAudioQueAsco(ctx, chatId) {
+    console.log(ctx.update.message.chat.id)
+    ctx.telegram
+	.sendVoice({
+	    chat_id: ctx.update.message.chat.id,
+	    voice: fs.createReadStream('/home/nvm/apps/parcerisbot/queascoche.mp3')
+	})
+	.catch((err) => {
+            console.log(err)
+	})
+}
+
+function displayPhotoDinar(ctx) {
+    const photoPath = '/home/nvm/apps/parcerisbot/dinar.jpg'
+    ctx.replyWithPhoto(ctx.update.message.chat.id, { source: fs.createReadStream(photoPath) })
+}
 
 function displayPriceBitcoin(ctx) {
    const url = "https://min-api.cryptocompare.com/data/price?fsym=BTC&tsyms=BTC,USD,EUR"
@@ -54,11 +59,6 @@ function displayPriceNeo(ctx) {
    })  
 }
 
-
-
-
-
-
 if(DEBUG) {
   bot.on('message', (ctx) => {
     //console.log(ctx)
@@ -71,6 +71,8 @@ if(DEBUG) {
     if(text.match(/bitcoin/i)) displayPriceBitcoin(ctx)
     if(text.match(/ethereum/i)) displayPriceEthereum(ctx)
     if(text.match(/neo/i)) displayPriceNeo(ctx)
+    if(text.match(/dinar/i)) displayPhotoDinar(ctx)
+    if(text.match(/asco/i)) displayAudioQueAsco(ctx)
   })
 }
 

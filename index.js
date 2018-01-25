@@ -14,9 +14,17 @@ const token = '510500699:AAEAf_fGn0u9mAocdMeSUP5YQLb1fatnz4U' // process.env.BOT
 const bot = new Telegraf(token)
 
 
+function displayAudioPistacho(ctx) {
+    ctx
+      .replyWithAudio({ source: fs.readFileSync('/home/nvm/apps/parcerisbot/pistacho.mp3'), caption: 'pistacho' })
+      .catch((err) => {
+         console.log(err)
+      })
+}
+
 function displayAudioQueAsco(ctx) {
     ctx
-      .replyWithAudio('http://st09.ioo.cat/queascoche.mp3')
+      .replyWithAudio({ source: fs.readFileSync('/home/nvm/apps/parcerisbot/queascoche.mp3'), caption: 'asco' })
       .catch((err) => {
          console.log(err)
       })
@@ -63,6 +71,7 @@ bot.on('message', (ctx) => {
   if(text.match(/neo/i)) displayPriceNeo(ctx)
   if(text.match(/dinar/i)) displayPhotoDinar(ctx)
   if(text.match(/asco/i)) displayAudioQueAsco(ctx)
+  if(text.match(/pistacho/i)) displayAudioPistacho(ctx)
 })
 
 bot.startPolling()

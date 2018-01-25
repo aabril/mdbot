@@ -13,10 +13,25 @@ const token = '510500699:AAEAf_fGn0u9mAocdMeSUP5YQLb1fatnz4U' // process.env.BOT
 
 const bot = new Telegraf(token)
 
+function displayAudioGabachos(ctx) {
+    ctx
+      .replyWithAudio({ source: fs.readFileSync('/home/nvm/apps/parcerisbot/gabachos.mp3'), caption: 'pistacho' })
+      .catch((err) => {
+         console.log(err)
+      })
+}
 
 function displayAudioPistacho(ctx) {
     ctx
       .replyWithAudio({ source: fs.readFileSync('/home/nvm/apps/parcerisbot/pistacho.mp3'), caption: 'pistacho' })
+      .catch((err) => {
+         console.log(err)
+      })
+}
+
+function displayAudioIuu(ctx) {
+    ctx
+      .replyWithAudio({ source: fs.readFileSync('/home/nvm/apps/parcerisbot/iuuu.mp3'), caption: 'iuuu' })
       .catch((err) => {
          console.log(err)
       })
@@ -57,21 +72,31 @@ function displayPriceNeo(ctx) {
 }
 
 bot.on('message', (ctx) => {
-
+  const from = ctx.update.message.from
   const text = ctx.update.message.text 
   const chatId = ctx.update.message.chat.id
 
   if(DEBUG) {
+    console.log(from)
     console.log(chatId)
     console.log(text)
   }
 
+  if(!text) return
   if(text.match(/bitcoin/i)) displayPriceBitcoin(ctx)
   if(text.match(/ethereum/i)) displayPriceEthereum(ctx)
   if(text.match(/neo/i)) displayPriceNeo(ctx)
   if(text.match(/dinar/i)) displayPhotoDinar(ctx)
   if(text.match(/asco/i)) displayAudioQueAsco(ctx)
   if(text.match(/pistacho/i)) displayAudioPistacho(ctx)
+
+  if(text.match(/iuu/i)) displayAudioIuu(ctx)
+  if(text.match(/yiu/i)) displayAudioIuu(ctx)
+
+  if(text.match(/frança/i)) displayAudioGabachos(ctx)
+  if(text.match(/francia/i)) displayAudioGabachos(ctx)
+  if(text.match(/gabacho/i)) displayAudioGabachos(ctx)
+  if(text.match(/francés/i)) displayAudioGabachos(ctx)
 })
 
 bot.startPolling()

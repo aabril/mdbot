@@ -2,3 +2,4 @@ node_modules
 *.swp
 .env
 .DS_Store
+testimage.png

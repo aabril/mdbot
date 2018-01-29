@@ -8,6 +8,14 @@ if (global.CanvasGradient === undefined) {
   global.CanvasGradient = function() {};
 }
 
+chartNode.on('beforeDraw', function (chartInstance) {
+    chartInstance.defaults.line.backgroundColor = "white"
+    // const ctx = chartInstance.Line.ctx;
+    // ctx.fillStyle = "white";
+    // ctx.fillRect(0, 0, chartInstance.line.width, chartInstance.line.height);
+});
+
+
 function objectToQuerystring (obj) {
     return Object.keys(obj).reduce(function (str, key, i) {
       var delimiter, val;
@@ -18,7 +26,7 @@ function objectToQuerystring (obj) {
     }, '');
   }
 
-function getConfig(cryptoPricesArr1, cryptoTimesArr1, cryptoPricesArr2, title){
+function getConfig(cryptoPricesArr1, cryptoTimesArr1, cryptoPricesArr2){
     const TITLE = "ETH en USD"
     
     const ethPrices = [55, 32, 40, 45, 50, 55, 60, 54, 50, 48, 40, 42]
@@ -52,7 +60,7 @@ function getConfig(cryptoPricesArr1, cryptoTimesArr1, cryptoPricesArr2, title){
             },
             title:{
                 display:true,
-                text: title
+                text: TITLE
             },
             tooltips: {
                 mode: 'index',
@@ -84,34 +92,10 @@ function getConfig(cryptoPricesArr1, cryptoTimesArr1, cryptoPricesArr2, title){
     return config
 }
 
-function generateGraphPng(config, cb){
-  chartNode
-    .drawChart(config)
-    .then(() => {
-      return chartNode.getImageBuffer('image/png')
-    })
-    .then(buffer => {
-      return chartNode.getImageStream('image/png')
-    })
-    .then(streamResult => {
-      return chartNode.getImageStream('image/png')
-    })
-    .then(streamResult => {
-      // using the length property you can do things like
-      // directly upload the image to s3 by using the
-      // stream and length properties
-      // streamResult.stream // => Stream object
-      // streamResult.length // => Integer length of stream
-      // write to a file
-      return chartNode.writeImageToFile('image/png', './testimage.png');
+function generateGraphPng(config){
+  chartNode.drawChart(config).then(buffer => {
+    return chartNode.writeImageToFile('image/png', './testimage.png');
   })
-  .then(() => {
-      // chart is now written to the file path
-      // ./testimage.png
-      cb()
-  });
-
-
 }
 
 
@@ -141,7 +125,7 @@ function getHistoric(options, cb) {
     .catch((err) => cb(null, err))
 }
 
-function getValuesArray(arrObjects) {
+function getValuesArray(arrObjects){
   const result = []
   arrObjects.forEach(element => {
     result.push(element.close)
@@ -149,7 +133,7 @@ function getValuesArray(arrObjects) {
   return result
 }
 
-function getTimesArray(arrObjects) {
+function getTimesArray(arrObjects){
     const result = []
     arrObjects.forEach(element => {
       const date = moment(element.time * 1000).endOf('day').fromNow();
@@ -157,34 +141,26 @@ function getTimesArray(arrObjects) {
     });
     result[result.length] = "now"
     return result
-}
-
-module.exports = (ctx) => {
-  const text = ctx.update.message.text
-  const arguments = text.split(" ")
-
-  if(arguments[1]==="help") ctx.reply('Proximament, paciència cabrons')
-
-  const options = {
-    cryptoCode: arguments[1].toUpperCase(),
-    exchangeCode: arguments[2].toUpperCase(),
-    ndays: arguments[3]
   }
 
-  const fnCb = (data, err) => {
-    if(err) return console.log(err)
-    const values = getValuesArray(data)
-    const times = getTimesArray(data)
-    const title = options.cryptoCode + " en " + options.exchangeCode + " / " + options.ndays + " dies"
-    const config = getConfig(values, times, "", title)
-    generateGraphPng(config, () => {
-      ctx
-        .replyWithPhoto({ source: './testimage.png' })
-        .catch((err) => {
-          console.log(err)
-        })
-    })
+
+function main() {
+    const options = {
+        cryptoCode: 'BTC',
+        exchangeCode: 'USD',
+        ndays: 365
+    }
+
+    const fnCb = (data, err) => {
+        if(err) return console.log(err)
+        const values = getValuesArray(data)
+        const times = getTimesArray(data)
+        const config = getConfig(values, times)
+        generateGraphPng(config)
+    }
+
+    getHistoric(options, fnCb)
 }
 
-  getHistoric(options, fnCb)
-}
+
+main()

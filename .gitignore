@@ -5,9 +5,8 @@ node_modules
 testimage.png
 package-lock.json
 
-
 content
 !.gitignore
 !.gitkeep
 
-
+yarn-error.log
